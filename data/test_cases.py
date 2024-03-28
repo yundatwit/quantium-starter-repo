@@ -1,5 +1,5 @@
 import dash.testing.wait as wait
-from selenium.webdriver.common.by import By
+from selenium import webdriver
 
 def header_test(dash_duo):
     dash_duo.start_server(app)
