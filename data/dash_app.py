@@ -8,24 +8,31 @@ data['date'] = pd.to_datetime(data['date'])
 data['sales'] = data['sales'].astype(float)
 data = data.sort_values(by='date')
 
-sales_before = data[data['date'] < '2021-01-15']['sales'].sum()
-sales_after = data[data['date'] >= '2021-01-15']['sales'].sum()
-difference = (sales_after - sales_before)
+regions = ['north', 'east', 'south', 'west', 'all']
 
 app = dash.Dash('Quantium')
 
 app.layout = html.Div([
     html.H1("Visualization of Sales"),
-    dcc.Graph(
-        id = 'sales',
-        figure = px.line(data, x = 'date', y = 'sales', title = 'Sales Over Time')
+    dcc.RadioItems(
+        id = 'Select-Region',
+        options=[{'label': region.capitalize(), 'value': region} for region in regions],
+        value='all',
+        labelStyle={'display': 'inline-block'}
     ),
-    html.Div([
-        html.H3("Sales before January 15, 2021: ${:,.2f}".format(sales_before)),
-        html.H3("Sales after January 15, 2021: ${:,.2f}".format(sales_after)),
-        html.H3("Difference in sales: ${:,.2f}".format(difference))
+    dcc.Graph(
+        id='sales'
+    )
     ])
-])
+
+def update_chart(selection_of_region):
+    if selection_of_region == 'all':
+        filtered_data = data
+    else:
+        filtered_data = data[data['region'] == selection_of_region]
+
+    fig = px.line(filtered_data, x = 'date', y = 'sales', title = 'Sales Over Time')
+    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
